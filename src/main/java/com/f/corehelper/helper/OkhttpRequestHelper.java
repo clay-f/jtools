@@ -1,6 +1,6 @@
-package com.f.core.helper;
+package com.f.corehelper.helper;
 
-import com.f.core.exception.CustomizedInterruptedException;
+import com.f.corehelper.exception.CustomizedInterruptedException;
 import okhttp3.*;
 import okhttp3.logging.HttpLoggingInterceptor;
 import org.slf4j.Logger;

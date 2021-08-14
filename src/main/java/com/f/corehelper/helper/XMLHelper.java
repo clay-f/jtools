@@ -1,4 +1,4 @@
-package com.f.core.helper;
+package com.f.corehelper.helper;
 
 import java.util.ArrayList;
 import java.util.List;
