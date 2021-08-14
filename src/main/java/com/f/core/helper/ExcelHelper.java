@@ -6,7 +6,6 @@ import com.f.core.helper.excel.download.DownloadExcel;
 import com.f.core.helper.excel.download.DownloadExcelWriteList;
 import com.f.core.helper.excel.download.DownloadExcelWriteListMap;
 import com.f.core.helper.excel.upload.ReadUploadExcel;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -295,22 +294,19 @@ public final class ExcelHelper {
      * @param t        写数据实现类对象
      * @param headers  表头
      * @param data     表内容
-     * @param response response
+     * @param outputStream 输出流
      * @param <T>      实现类类型
      * @param <H>      表头类型
      * @param <D>      表内容类型
      */
-    public static <T extends DownloadExcel, H, D> void writeDownloadExcel(T t, List<H> headers, List<D> data, HttpServletResponse response) {
+    public static <T extends DownloadExcel, H, D> void writeDownloadExcel(T t, List<H> headers, List<D> data, OutputStream outputStream) {
         Objects.requireNonNull(t);
         Objects.requireNonNull(data);
         Workbook workbook = new XSSFWorkbook();
         CellStyle cellStyle = getCellStyleConfig(workbook);
         CreationHelper creationHelper = workbook.getCreationHelper();
         Sheet sheet = workbook.createSheet();
-        response.reset();
-        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.addHeader("content-disposition", "attachment; filename=data.xlsx");
-        try (OutputStream outputStream = response.getOutputStream()) {
+        try (BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream)) {
             if (t instanceof DownloadExcelWriteList) {
                 ((DownloadExcelWriteList<D>) t).writeBody(sheet, data, sheet.getLastRowNum(), cellStyle, creationHelper);
             } else if (t instanceof DownloadExcelWriteListMap) {
@@ -318,7 +314,7 @@ public final class ExcelHelper {
                 //表头占用了一行，所以写内容的时候要+1
                 ((DownloadExcelWriteListMap<H, D>) t).writeBody(headers, data, sheet.getLastRowNum() + 1, sheet, cellStyle, creationHelper);
             }
-            workbook.write(outputStream);
+            workbook.write(bufferedOutputStream);
         } catch (IOException e) {
             e.printStackTrace();
         }
