@@ -119,29 +119,24 @@ public final class ExcelHelper {
     }
 
     private static String readCellValue(Cell cell) {
-        String cellValue = null;
         switch (cell.getCellType()) {
             case STRING:
-                cellValue = cell.getStringCellValue();
-                break;
+                return cell.getStringCellValue();
             case FORMULA:
-                cellValue = cell.getCellFormula();
-                break;
+                return cell.getCellFormula();
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    cellValue = cell.getDateCellValue().toString();
+                    return cell.getDateCellValue().toString();
                 } else {
-                    cellValue = Double.toString(cell.getNumericCellValue());
+                    return Double.toString(cell.getNumericCellValue());
                 }
-                break;
-            case BLANK:
-                cellValue = "";
-                break;
             case BOOLEAN:
-                cellValue = Boolean.toString(cell.getBooleanCellValue());
-                break;
+                return Boolean.toString(cell.getBooleanCellValue());
+            case BLANK:
+            case ERROR:
+            default:
+                return "";
         }
-        return cellValue;
     }
 
     /**
@@ -291,13 +286,13 @@ public final class ExcelHelper {
      *
      * </pre>
      *
-     * @param t        写数据实现类对象
-     * @param headers  表头
-     * @param data     表内容
+     * @param t            写数据实现类对象
+     * @param headers      表头
+     * @param data         表内容
      * @param outputStream 输出流
-     * @param <T>      实现类类型
-     * @param <H>      表头类型
-     * @param <D>      表内容类型
+     * @param <T>          实现类类型
+     * @param <H>          表头类型
+     * @param <D>          表内容类型
      */
     public static <T extends DownloadExcel, H, D> void writeDownloadExcel(T t, List<H> headers, List<D> data, OutputStream outputStream) {
         Objects.requireNonNull(t);
