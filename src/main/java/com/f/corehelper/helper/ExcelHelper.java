@@ -188,6 +188,7 @@ public final class ExcelHelper {
         font.setFontName(DEFAULT_FONT);
         font.setFontHeightInPoints((short) DEFAULT_FONT_SIZE);
         CellStyle cellStyle = workbook.createCellStyle();
+        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setFont(font);
         return cellStyle;
     }
