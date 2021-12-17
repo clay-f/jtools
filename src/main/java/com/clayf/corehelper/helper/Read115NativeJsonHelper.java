@@ -1,4 +1,4 @@
-package com.f.corehelper.helper;
+package com.clayf.corehelper.helper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -91,6 +91,12 @@ public final class Read115NativeJsonHelper {
     }
 
 
+    /**
+     * 测试用例
+     *
+     * @param args none
+     * @throws IOException none
+     */
     public static void main(String[] args) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         DirItem dirItem = objectMapper.readValue(new File("C:\\Users\\f\\Downloads\\6.1献礼\\JSON文件转存\\@115sha1_日系步兵_560GB 418文件.json"), DirItem.class);

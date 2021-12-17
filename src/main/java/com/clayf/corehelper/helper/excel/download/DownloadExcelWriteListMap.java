@@ -1,5 +1,6 @@
-package com.f.corehelper.helper.excel.download;
+package com.clayf.corehelper.helper.excel.download;
 
+import com.clayf.corehelper.helper.ExcelHelper;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * 下载excel文件接口。
  * <p>
- * 字体使用 {@link com.f.util.ExcelHelper#DEFAULT_FONT font}，size: 12
+ * 字体使用 {@link ExcelHelper#DEFAULT_FONT font}，size: 12
  * <p>
  * created by f at 2020-12-19 20:02
  *
@@ -21,9 +22,9 @@ public interface DownloadExcelWriteListMap<H, D> extends DownloadExcel {
      * 写入表头，默认从第一行开始。
      *
      * @param data           表头
-     * @param sheet
-     * @param cellStyle
-     * @param creationHelper
+     * @param sheet excel 表
+     * @param cellStyle cell样式
+     * @param creationHelper 写入数据样式
      */
     void writeHeader(List<H> data, Sheet sheet, CellStyle cellStyle, CreationHelper creationHelper);
 
@@ -31,8 +32,8 @@ public interface DownloadExcelWriteListMap<H, D> extends DownloadExcel {
      * 写入表内容，默认从第二行开始。
      * <p>
      * 写入数据的时候，是否需要使用表头根据具体需要实现。
-     * 例:
      * <table border="1">
+     *     <caption>样例</caption>
      *    <thead>
      *        <tr><th>name</th><th>sex</th></tr>
      *    </thead>
@@ -49,9 +50,9 @@ public interface DownloadExcelWriteListMap<H, D> extends DownloadExcel {
      * @param header         表头。用于映射表头与表内容字段的关系
      * @param data           内容
      * @param curRowNum      当前行
-     * @param sheet
-     * @param cellStyle
-     * @param creationHelper
+     * @param sheet excel sheet
+     * @param cellStyle cell 样式
+     * @param creationHelper 字符样式
      */
     void writeBody(List<H> header, List<D> data, int curRowNum, Sheet sheet, CellStyle cellStyle, CreationHelper creationHelper);
 }

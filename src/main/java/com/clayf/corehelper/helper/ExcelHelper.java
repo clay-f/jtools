@@ -1,11 +1,11 @@
-package com.f.corehelper.helper;
+package com.clayf.corehelper.helper;
 
 
-import com.f.corehelper.helper.excel.download.impl.DownloadExcelWriteListImpl;
-import com.f.corehelper.helper.excel.download.DownloadExcel;
-import com.f.corehelper.helper.excel.download.DownloadExcelWriteList;
-import com.f.corehelper.helper.excel.download.DownloadExcelWriteListMap;
-import com.f.corehelper.helper.excel.upload.ReadUploadExcel;
+import com.clayf.corehelper.helper.excel.download.DownloadExcel;
+import com.clayf.corehelper.helper.excel.upload.ReadUploadExcel;
+import com.clayf.corehelper.helper.excel.download.impl.DownloadExcelWriteListImpl;
+import com.clayf.corehelper.helper.excel.download.DownloadExcelWriteList;
+import com.clayf.corehelper.helper.excel.download.DownloadExcelWriteListMap;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -29,6 +29,9 @@ public final class ExcelHelper {
      * 写入文件使用默认字体。
      */
     public static final String DEFAULT_FONT = "Mac OS X".equals(System.getProperty("os.name")) ? "SFNSMono" : "Microsoft YaHei UI";
+    /**
+     * 默认字体大小
+     */
     public static final int DEFAULT_FONT_SIZE = 12;
 
     private ExcelHelper() {
@@ -90,7 +93,6 @@ public final class ExcelHelper {
     /**
      * 读取 excel 文件为 list
      * <p>
-     * <p>
      * 使用场景: 单纯的把excel全部转化为list，没有表头之分
      *
      * @param file excel 文件
@@ -106,6 +108,12 @@ public final class ExcelHelper {
         return result;
     }
 
+    /**
+     * 读取sheet数据，保存到list
+     *
+     * @param sheet  sheet
+     * @param result list结果。将sheet读取到的数据，保存在list
+     */
     public static void readSheet(Sheet sheet, List<List<String>> result) {
         for (Row item : sheet)
             result.add(readRow(item));
@@ -193,6 +201,14 @@ public final class ExcelHelper {
         return cellStyle;
     }
 
+    /**
+     * 将header写入row
+     *
+     * @param header         表头
+     * @param row            excel行数据
+     * @param creationHelper 字符配置
+     * @param cellStyle      cell配置
+     */
     public static void writeHeader(List<String> header, Row row, CreationHelper creationHelper, CellStyle cellStyle) {
         Cell cell;
         for (int i = 0; i < header.size(); i++) {
@@ -202,6 +218,18 @@ public final class ExcelHelper {
         }
     }
 
+    /**
+     * 将data按照headers为索引写入sheet。
+     * <p>
+     * 循环data，将data的每一项，按照headers写入sheet的每一行
+     *
+     * @param data           数据源
+     * @param headers        每一行数据的索引
+     * @param currentRow     当前写入行
+     * @param sheet          sheet
+     * @param creationHelper 写入字符配置
+     * @param cellStyle      cell配置
+     */
     public static void writeBody(List<Map<String, String>> data, List<String> headers, int currentRow, Sheet sheet, CreationHelper creationHelper, CellStyle cellStyle) {
         Cell cell;
         Row row;
@@ -222,7 +250,7 @@ public final class ExcelHelper {
      * 写入所有的list到excel，不包含表头。
      *
      * @param file excel
-     * @param data 数据data
+     * @param data 数据
      */
     public static void writeExcelWithList(File file, List<List<String>> data) {
         Workbook workbook = new XSSFWorkbook();
@@ -237,6 +265,15 @@ public final class ExcelHelper {
         }
     }
 
+    /**
+     * 将data数据写入sheet
+     *
+     * @param data           数据源
+     * @param sheet          被写入的sheet
+     * @param curRowNum      写入数据起始行。在写入的时候，从这一行开始写
+     * @param cellStyle      cell配置
+     * @param creationHelper 写入数据配置
+     */
     public static void writeBody(List<List<String>> data, Sheet sheet, int curRowNum, CellStyle cellStyle, CreationHelper creationHelper) {
         Cell cell;
         Row row;
@@ -255,9 +292,8 @@ public final class ExcelHelper {
     /**
      * 下载文件。
      * <p>
-     * 使用方法，首先确定要写入的数据结构是什么，然后查看已有实现是否能够满足要求，
+     * 使用方法，首先确定要写入的数据结构是什么，然后查看已有实现是否能够满足要求，目前有两种实现
      * <ol>
-     *     目前有两种实现
      *     <li>
      *         {@link DownloadExcelWriteListImpl 单纯写list}。就是将所有list写入表格
      *     </li>

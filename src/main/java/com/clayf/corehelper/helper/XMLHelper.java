@@ -1,12 +1,23 @@
-package com.f.corehelper.helper;
+package com.clayf.corehelper.helper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * xml 工具类
+ * created by f at 2021-12-09 22:51
+ */
 public class XMLHelper {
     private XMLHelper() {
     }
 
+    /**
+     * 获取唯一节点内容
+     *
+     * @param iXmlContent xml内容
+     * @param iTagName    目标tag名字
+     * @return 获取tag值
+     */
     public static String getUniqueNodeContent(String iXmlContent, String iTagName) {
         if (iXmlContent != null && iTagName != null) {
             String _openTag = "<" + iTagName;
@@ -36,6 +47,13 @@ public class XMLHelper {
         }
     }
 
+    /**
+     * 获取节点内容
+     *
+     * @param iXmlContent 内容
+     * @param iTagName    目标标签
+     * @return 标签内容
+     */
     public static List<String> getNodeContent(String iXmlContent, String iTagName) {
         if (iXmlContent != null && iTagName != null) {
             List<String> _contentList = new ArrayList();
