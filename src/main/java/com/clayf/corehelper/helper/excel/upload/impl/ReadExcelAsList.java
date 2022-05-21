@@ -16,7 +16,7 @@ public class ReadExcelAsList implements ReadUploadExcel<List<String>> {
     @Override
     public List<List<String>> readFile(Workbook workbook) {
         List<List<String>> result = Lists.newArrayList();
-        ExcelHelper.readSheet(workbook.getSheetAt(0), result);
+        ExcelHelper.readSheet(workbook.getSheetAt(0), result, workbook.getCreationHelper().createFormulaEvaluator());
         return result;
     }
 }

@@ -68,7 +68,7 @@ public final class ExcelHelper {
                 if (row.getRowNum() == 0)
                     columnMap = getExcelRowValueToMap(row);
                 else
-                    resultListMap.add(convertRowToMap(columnMap, row));
+                    resultListMap.add(convertRowToMap(columnMap, row, xssfWorkbook.getCreationHelper().createFormulaEvaluator()));
             }
         } catch (InvalidFormatException | IOException e) {
             e.printStackTrace();
@@ -83,10 +83,10 @@ public final class ExcelHelper {
         return columnMap;
     }
 
-    private static Map<String, String> convertRowToMap(Map<Integer, String> columnMap, Row row) {
+    private static Map<String, String> convertRowToMap(Map<Integer, String> columnMap, Row row, FormulaEvaluator formulaEvaluator) {
         Map<String, String> rowMap = new HashMap<>();
         for (Cell item : row)
-            rowMap.put(columnMap.get(item.getColumnIndex()), readCellValue(item));
+            rowMap.put(columnMap.get(item.getColumnIndex()), readCellValue(item, formulaEvaluator));
         return rowMap;
     }
 
@@ -101,7 +101,7 @@ public final class ExcelHelper {
     public static List<List<String>> readExcelAsList(File file) {
         List<List<String>> result = new ArrayList<>();
         try (Workbook workbook = WorkbookFactory.create(file)) {
-            readSheet(workbook.getSheetAt(0), result);
+            readSheet(workbook.getSheetAt(0), result, workbook.getCreationHelper().createFormulaEvaluator());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -114,37 +114,32 @@ public final class ExcelHelper {
      * @param sheet  sheet
      * @param result list结果。将sheet读取到的数据，保存在list
      */
-    public static void readSheet(Sheet sheet, List<List<String>> result) {
+    public static void readSheet(Sheet sheet, List<List<String>> result, FormulaEvaluator formulaEvaluator) {
         for (Row item : sheet)
-            result.add(readRow(item));
+            result.add(readRow(item, formulaEvaluator));
     }
 
-    private static List<String> readRow(Row row) {
+    private static List<String> readRow(Row row, FormulaEvaluator formulaEvaluator) {
         List<String> rowVal = new ArrayList<>();
         for (Cell item : row)
-            rowVal.add(readCellValue(item));
+            rowVal.add(readCellValue(item, formulaEvaluator));
         return rowVal;
     }
 
-    private static String readCellValue(Cell cell) {
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case FORMULA:
-                return cell.getCellFormula();
-            case NUMERIC:
+    private static String readCellValue(Cell cell, FormulaEvaluator formulaEvaluator) {
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue();
+            case FORMULA -> formulaEvaluator.evaluate(cell).toString();
+            case NUMERIC -> {
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getDateCellValue().toString();
+                    yield  cell.getDateCellValue().toString();
                 } else {
-                    return Double.toString(cell.getNumericCellValue());
+                    yield  Double.toString(cell.getNumericCellValue());
                 }
-            case BOOLEAN:
-                return Boolean.toString(cell.getBooleanCellValue());
-            case BLANK:
-            case ERROR:
-            default:
-                return "";
-        }
+            }
+            case BOOLEAN -> Boolean.toString(cell.getBooleanCellValue());
+            default ->"";
+        };
     }
 
     /**
@@ -339,12 +334,12 @@ public final class ExcelHelper {
         CreationHelper creationHelper = workbook.getCreationHelper();
         Sheet sheet = workbook.createSheet();
         try (BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream)) {
-            if (t instanceof DownloadExcelWriteList) {
-                ((DownloadExcelWriteList<D>) t).writeBody(sheet, data, sheet.getLastRowNum(), cellStyle, creationHelper);
-            } else if (t instanceof DownloadExcelWriteListMap) {
-                ((DownloadExcelWriteListMap<H, D>) t).writeHeader(headers, sheet, cellStyle, creationHelper);
+            if (t instanceof DownloadExcelWriteList writer) {
+                writer.writeBody(sheet, data, sheet.getLastRowNum(), cellStyle, creationHelper);
+            } else if (t instanceof DownloadExcelWriteListMap writer) {
+                writer.writeHeader(headers, sheet, cellStyle, creationHelper);
                 //表头占用了一行，所以写内容的时候要+1
-                ((DownloadExcelWriteListMap<H, D>) t).writeBody(headers, data, sheet.getLastRowNum() + 1, sheet, cellStyle, creationHelper);
+                writer.writeBody(headers, data, sheet.getLastRowNum() + 1, sheet, cellStyle, creationHelper);
             }
             workbook.write(bufferedOutputStream);
         } catch (IOException e) {
