@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<configuration status="warn">
+    <!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+    <!--变量配置-->
+    <Properties>
+        <!-- 定义日志存储的路径 -->
+        <property name="FILE_PATH" value="logs/"/>
+        <property name="FILE_NAME" value="app"/>
+        <Property name="LOG_DATEFORMAT_PATTERN">yyyy-MM-dd HH:mm:ss.SSS</Property>
+        <!--        <Property name="LOG_EXCEPTION_CONVERSION_WORD">%xwEx</Property>-->
+        <!--        <Property name="LOG_LEVEL_PATTERN">%5p</Property>-->
+        <!--        <Property name="CONSOLE_LOG_PATTERN">%clr{%d{${LOG_DATEFORMAT_PATTERN}}}{faint} %clr{${LOG_LEVEL_PATTERN}} %clr{%pid}{magenta} %clr{-&#45;&#45;}{faint} %clr{[%15.15t]}{faint} %clr{%-40.40c{1.}}{cyan} %clr{:}{faint} %m%n${sys:LOG_EXCEPTION_CONVERSION_WORD}</Property>-->
+        <Property name="COMMON_LOG_PATTERN">%style{%d{${LOG_DATEFORMAT_PATTERN}}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%c{1.}}{bright,yellow} : %msg%n%throwable</Property>
+        <Property name="FILE_LOG_PATTERN" value="%d{${LOG_DATEFORMAT_PATTERN}} %-5p [%t] %c{1.} : %m%n%throwable"/>
+    </Properties>
+
+    <appenders>
+        <console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout
+                    pattern="${COMMON_LOG_PATTERN}"/>
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+        </console>
+
+        <!-- 这个会打印出所有的info及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFileInfo" fileName="${FILE_PATH}/info.log"
+                     filePattern="${FILE_PATH}/${FILE_NAME}-INFO-%d{yyyy-MM-dd}_%i.log.gz" immediateFlush="false"
+                     append="false">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <DefaultRolloverStrategy max="15"/>
+        </RollingFile>
+
+        <!-- 这个会打印出所有的warn及以下级别的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档-->
+        <RollingFile name="RollingFileWarn" fileName="${FILE_PATH}/warn.log"
+                     filePattern="${FILE_PATH}/${FILE_NAME}-WARN-%d{yyyy-MM-dd}_%i.log.gz" immediateFlush="false">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <DefaultRolloverStrategy max="15"/>
+        </RollingFile>
+
+        <RollingFile name="RollingFileError" fileName="${FILE_PATH}/error.log"
+                     filePattern="${FILE_PATH}/${FILE_NAME}-ERROR-%d{yyyy-MM-dd}_%i.log.gz" immediateFlush="false">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <DefaultRolloverStrategy max="15"/>
+        </RollingFile>
+
+        <RollingFile name="TransactionAndSql" fileName="${FILE_PATH}/transaction-sql.log"
+                     filePattern="${FILE_PATH}/${FILE_NAME}-SQL-%d{yyyy-MM-dd}_%i.log.gz" immediateFlush="false"
+                     append="false">
+            <PatternLayout pattern="${FILE_LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="200MB"/>
+            </Policies>
+            <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件开始覆盖-->
+            <DefaultRolloverStrategy max="15"/>
+        </RollingFile>
+    </appenders>
+
+    <loggers>
+        <root level="info" includeLocation="false">
+            <appender-ref ref="Console"/>
+<!--            <appender-ref ref="RollingFileInfo"/>-->
+<!--            <appender-ref ref="RollingFileError"/>-->
+        </root>
+<!--        <logger name="com.f.web.mapper" level="debug" additivity="false">-->
+<!--            <appender-ref ref="RollingFileInfo"/>-->
+<!--            <appender-ref ref="Console"/>-->
+<!--        </logger>-->
+    </loggers>
+</configuration>
+
