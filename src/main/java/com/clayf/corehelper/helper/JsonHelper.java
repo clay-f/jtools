@@ -2,7 +2,6 @@ package com.clayf.corehelper.helper;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -25,7 +24,6 @@ public final class JsonHelper {
                 .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
                 .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
                 .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-                .configure(JsonWriteFeature.ESCAPE_NON_ASCII.mappedFeature(), true)
                 .registerModules(new JavaTimeModule());
     }
 
