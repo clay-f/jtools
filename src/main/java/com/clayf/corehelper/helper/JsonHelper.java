@@ -6,8 +6,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT;
+import java.time.ZoneId;
+import java.util.Locale;
+import java.util.TimeZone;
+
 
 /**
  * json 工具类
@@ -18,13 +22,15 @@ public final class JsonHelper {
 
     static {
         OBJECT_MAPPER = new ObjectMapper()
+                .setLocale(Locale.CHINA)
+                .setTimeZone(TimeZone.getTimeZone(ZoneId.systemDefault()))
                 .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS, SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .enable(ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+                .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
                 .configure(JsonParser.Feature.ALLOW_COMMENTS, true)
                 .configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
                 .configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, true)
-                .registerModules(new JavaTimeModule());
+                .registerModules(new JavaTimeModule(), new ParameterNamesModule());
     }
 
     private JsonHelper() {
